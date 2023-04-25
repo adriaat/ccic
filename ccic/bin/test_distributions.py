@@ -298,16 +298,16 @@ def process_dataset(mrnn, data_loader, device="cpu"):
         "tiwp_sample": (("samples",), tiwp_sample),
         "tiwp_true": (("samples",), tiwp_true),
         "tiwp_log_std_dev": (("samples",), tiwp_log_std_dev),
-        "tiwp_distribution": (("samples", "quantiles_tiwp"), tiwp_distribution),
+        "tiwp_distribution": (("samples", "quantile_levels_tiwp"), tiwp_distribution),
         "tiwp_fpavg_mean": (("samples",), tiwp_fpavg_mean),
         "tiwp_fpavg_sample": (("samples",), tiwp_fpavg_sample),
         "tiwp_fpavg_true": (("samples",), tiwp_fpavg_true),
         "tiwp_fpavg_log_std_dev": (("samples",), tiwp_fpavg_log_std_dev),
-        "tiwp_fpavg_distribution": (("samples", "quantiles_tiwp"), tiwp_fpavg_distribution),
+        "tiwp_fpavg_distribution": (("samples", "quantile_levels_tiwp"), tiwp_fpavg_distribution),
         "tiwc_mean": (("samples", "levels"), tiwc_mean),
         "tiwc_sample": (("samples", "levels"), tiwc_sample),
         "tiwc_true": (("samples", "levels"), tiwc_true),
-        "tiwc_distribution": (("samples", "levels", "quantiles_tiwc"), tiwc_distribution),
+        "tiwc_distribution": (("samples", "levels", "quantile_levels_tiwc"), tiwc_distribution),
         "cloud_class_prob": (("samples", "levels", "classes",), cloud_class_prob),
         "cloud_class_true": (("samples", "levels"), cloud_class_true),
         "cloud_prob": (("samples",), cloud_prob),
@@ -319,8 +319,8 @@ def process_dataset(mrnn, data_loader, device="cpu"):
         "latitude": (("samples",), latitude),
         "granule": (("samples",), granule),
         "tbs": (("samples",), tbs),
-        "quantiles_tiwp": (("quantiles_tiwp",), mrnn.losses['tiwp'].quantiles),
-        "quantiles_tiwc": (("quantiles_tiwc",), mrnn.losses['tiwc'].quantiles)
+        "quantile_levels_tiwp": (("quantile_levels_tiwp",), mrnn.losses['tiwp'].quantiles),
+        "quantile_levels_tiwc": (("quantile_levels_tiwc",), mrnn.losses['tiwc'].quantiles)
     })
 
     enc_float = {"dtype": "float32", "zlib": True}

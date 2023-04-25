@@ -22,6 +22,7 @@ def ccic():
     from ccic.bin import process
     from ccic.bin import extract_training_data
     from ccic.bin import test
+    from ccic.bin import test_distributions
 
     warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -34,6 +35,7 @@ def ccic():
     process.add_parser(subparsers)
     extract_training_data.add_parser(subparsers)
     test.add_parser(subparsers)
+    test_distributions.add_parser(subparsers)
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
