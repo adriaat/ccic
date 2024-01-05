@@ -181,10 +181,9 @@ def get_input_files(
 
     if offline:
         files = input_cls.find_files(path=path, start_time=start_time, end_time=end_time)
-        files = [input_cls(filename) for filename in files]
     else:
         files = input_cls.get_available_files(start_time=start_time, end_time=end_time)
-        files = [
+    return [
         RemoteFile(
             input_cls,
             filename,
@@ -193,7 +192,6 @@ def get_input_files(
         )
         for filename in files
     ]
-    return files
 
 
 def determine_cloud_class(class_probs, threshold=0.638, axis=1):
