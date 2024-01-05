@@ -201,6 +201,13 @@ def add_parser(subparsers):
             "retrieval."
         ),
     )
+    parser.add_argument(
+        '--offline',
+        action='store_true',
+        help=(
+            "Work offline without accessing any online file server"
+        )
+    )
     parser.set_defaults(func=run)
 
 
@@ -459,6 +466,7 @@ def run(args):
         start_time,
         end_time=end_time,
         path=working_dir,
+        offline=args.offline
     )
     if args.failed:
         if database_path is None:

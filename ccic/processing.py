@@ -150,6 +150,7 @@ def get_input_files(
     end_time=None,
     path=None,
     thread_pool=None,
+    offline=False
 ):
     """
     Determine local or remote input files.
@@ -169,6 +170,7 @@ def get_input_files(
         path: If given, will be used to look for local files.
         thread_pool: An optional thread pool to use for the prefetching
             of remote files.
+        offline: Look only for files locally available
 
     Return:
         A list
@@ -177,8 +179,12 @@ def get_input_files(
     if end_time is None:
         end_time = start_time
 
-    files = input_cls.get_available_files(start_time=start_time, end_time=end_time)
-    return [
+    if offline:
+        files = input_cls.find_files(path=path, start_time=start_time, end_time=end_time)
+        files = [input_cls(filename) for filename in files]
+    else:
+        files = input_cls.get_available_files(start_time=start_time, end_time=end_time)
+        files = [
         RemoteFile(
             input_cls,
             filename,
@@ -187,6 +193,7 @@ def get_input_files(
         )
         for filename in files
     ]
+    return files
 
 
 def determine_cloud_class(class_probs, threshold=0.638, axis=1):
