@@ -546,7 +546,8 @@ def run(args):
     manager = Manager()
     download_queue = manager.Queue()
     processing_queue = manager.Queue(4)
-    device_lock = manager.Lock()
+    # device_lock = manager.Lock()
+    device_lock = None
 
     # Submit a download task for each file.
     for input_file in input_files:
