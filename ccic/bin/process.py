@@ -549,17 +549,17 @@ def run(args):
     processing_queue = manager.Queue(4)
     device_lock = manager.Lock()
 
+    # Submit a download task for each file.
+    for input_file in input_files:
+        download_queue.put(input_file)
+    download_queue.put(None)
+
     args = (download_queue, processing_queue, retrieval_settings)
     download_thread = Thread(target=download_files, args=args)
     args = (processing_queue, model, retrieval_settings, output, device_lock)
     processing_processes = [
         Process(target=process_files, args=args) for i in range(n_processes)
     ]
-
-    # Submit a download task for each file.
-    for input_file in input_files:
-        download_queue.put(input_file)
-    download_queue.put(None)
 
     download_thread.start()
     [proc.start() for proc in processing_processes]
