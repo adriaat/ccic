@@ -8,12 +8,11 @@ This sub-module implements the CLI to run the CCIC retrievals.
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import hashlib
 import logging
-from multiprocessing import Manager, Process, Lock
+from multiprocessing import Manager, Lock
 from pathlib import Path
 import shutil
 import subprocess
 from tempfile import TemporaryDirectory
-from threading import Thread
 
 import numpy as np
 
@@ -555,33 +554,22 @@ def run(args):
     download_queue.put(None)
 
     args = (download_queue, processing_queue, retrieval_settings)
-    download_thread = Thread(target=download_files, args=args)
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        # Download thread
+        executor.submit(download_files, *args)
+    
     args = (processing_queue, model, retrieval_settings, output, device_lock)
-    processing_processes = [
-        Process(target=process_files, args=args) for i in range(n_processes)
-    ]
 
-    download_thread.start()
-    [proc.start() for proc in processing_processes]
+    with ProcessPoolExecutor(max_workers=n_processes) as executor:
+        processing_futures = executor.submit(process_files, *args)
 
-    running = [download_thread] + processing_processes
+    any_failed = any(future.exception() is not None for future in processing_futures)
 
-    any_failed = False
-    while True:
-        running = [proc for proc in running if proc.is_alive()]
-        if len(running) == 0:
-            break
-        for processing_process in processing_processes:
-            if not processing_process.is_alive():
-                if processing_process.exitcode != 0:
-                    LOGGER.warning(
-                        "One of the processing processes terminated with a "
-                        " non-zero exit code. This indicates that the process "
-                        " was killed. Potentially due to memory issues."
-                    )
-                any_failed = True
-            processing_processes = [
-                proc for proc in processing_processes if proc.is_alive()
-            ]
+    if any_failed:
+        LOGGER.warning(
+            "One of the processing processes terminated with a "
+            " non-zero exit code. This indicates that the process "
+            " was killed. Potentially due to memory issues."
+        )
 
     return not any_failed
