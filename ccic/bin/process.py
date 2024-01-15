@@ -554,6 +554,7 @@ def run(args):
         download_queue.put(input_file)
     download_queue.put(None)
 
+<<<<<<< HEAD
     args = (download_queue, processing_queue, retrieval_settings)
     with ThreadPoolExecutor(max_workers=1) as executor:
         # Download thread
@@ -572,5 +573,35 @@ def run(args):
             " non-zero exit code. This indicates that the process "
             " was killed. Potentially due to memory issues."
         )
+=======
+    execution_units = [download_thread] + processing_processes
+    running = []
+    for e in execution_units:
+        e.start()
+        running.append(e)
+
+    any_failed = False
+    while len(running) > 0:
+        for proc in processing_processes:
+            if not proc.is_alive():
+                if proc.exitcode != 0:
+                    LOGGER.warning(
+                        "One of the processing processes terminated with a "
+                        " non-zero exit code. This indicates that the process "
+                        " was killed. Potentially due to memory issues."
+                    )
+                proc.join()
+                any_failed = True
+        processing_processes = [
+            proc for proc in processing_processes if proc.is_alive()
+        ]
+        updated_running = []
+        for e in running:
+            if e.is_alive():
+                updated_running.append(e)
+            else:
+                e.join()
+        running = updated_running
+>>>>>>> 33493fb (Explicitly join the execution units, and reorganize while loop)
 
     return not any_failed
