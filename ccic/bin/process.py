@@ -546,7 +546,8 @@ def run(args):
     manager = Manager()
     download_queue = manager.Queue()
     processing_queue = manager.Queue(4)
-    device_lock = manager.Lock()
+    # device_lock = manager.Lock()
+    device_lock = None
 
     args = (download_queue, processing_queue, retrieval_settings)
     download_thread = Thread(target=download_files, args=args)
